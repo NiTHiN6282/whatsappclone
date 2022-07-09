@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:whatsappclone/messagepage.dart';
 
-import 'datalist.dart';
 import 'main.dart';
 
 class ChatPage extends StatefulWidget {
@@ -35,7 +35,15 @@ class _ChatPageState extends State<ChatPage> {
                     return Material(
                       color: Color(0xff0e171c),
                       child: InkWell(
-                        onTap: () {},
+                        onTap: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => MessagePage(
+                                    rid: snapshot.data!.docs[index]['userid'],
+                                    uid: userId),
+                              ));
+                        },
                         child: Container(
                           padding: EdgeInsets.all(10),
                           decoration: BoxDecoration(

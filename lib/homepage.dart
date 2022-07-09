@@ -178,12 +178,14 @@ class _HomePageState extends State<HomePage>
                 left: 5,
                 width: 45,
                 child: FloatingActionButton(
+                  heroTag: "btn1",
                   backgroundColor: Color(0xff1c252c),
                   onPressed: () {},
                   child: Icon(Icons.edit),
                 )),
             Positioned(
                 child: FloatingActionButton(
+              heroTag: "btn2",
               backgroundColor: Color(0xff168670),
               onPressed: () {},
               child: iconCondition(),
