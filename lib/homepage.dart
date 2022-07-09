@@ -1,4 +1,6 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'chatpage.dart';
 
 class HomePage extends StatefulWidget {
@@ -11,15 +13,14 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage>
     with SingleTickerProviderStateMixin {
   late TabController _controller;
-  var checkVisibility=true;
+  var checkVisibility = true;
   int _selectedIndex = 1;
-  double editBottom=0;
-
+  double editBottom = 0;
 
   @override
   void initState() {
     super.initState();
-    _controller = TabController(length: 4, vsync: this,initialIndex: 1);
+    _controller = TabController(length: 4, vsync: this, initialIndex: 1);
 
     _controller.addListener(() {
       setState(() {
@@ -31,41 +32,89 @@ class _HomePageState extends State<HomePage>
 
   @override
   Widget build(BuildContext context) {
-    if(_selectedIndex==0){
-      setState((){
-        checkVisibility=false;
+    if (_selectedIndex == 0) {
+      setState(() {
+        checkVisibility = false;
       });
     }
-    if(_selectedIndex!=0){
-      setState((){
-        checkVisibility=true;
+    if (_selectedIndex != 0) {
+      setState(() {
+        checkVisibility = true;
       });
     }
-    if(_selectedIndex==2){
-      setState((){
-        editBottom=70;
+    if (_selectedIndex == 2) {
+      setState(() {
+        editBottom = 70;
       });
     }
-    if(_selectedIndex==1||_selectedIndex==3){
-      setState((){
-        editBottom=0;
+    if (_selectedIndex == 1 || _selectedIndex == 3) {
+      setState(() {
+        editBottom = 0;
       });
     }
-    var w=MediaQuery.of(context).size.width;
+    var w = MediaQuery.of(context).size.width;
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Color(0xff1c252c),
-        title: Text("WhatsApp",
+        title: Text(
+          "WhatsApp",
           style: TextStyle(
               color: Color(0xff728088),
               fontSize: 22,
-              fontWeight: FontWeight.w400
-          ),),
+              fontWeight: FontWeight.w400),
+        ),
         actions: [
-          Icon(Icons.search,
-              color: Color(0xff728088)),
-          Icon(Icons.more_vert,
-              color: Color(0xff728088))
+          Icon(Icons.search, color: Color(0xff728088)),
+          SizedBox(
+            width: 10,
+          ),
+          PopupMenuButton<int>(
+            color: Color(0xff1c252c),
+            itemBuilder: (context) => [
+              PopupMenuItem(
+                textStyle: TextStyle(color: Colors.white),
+                child: Text('New group'),
+                onTap: () {},
+              ),
+              PopupMenuItem(
+                textStyle: TextStyle(color: Colors.white),
+                child: Text('New broadcast'),
+                onTap: () {},
+              ),
+              PopupMenuItem(
+                textStyle: TextStyle(color: Colors.white),
+                child: Text('Linked devices'),
+                onTap: () {},
+              ),
+              PopupMenuItem(
+                textStyle: TextStyle(color: Colors.white),
+                child: Text('Starred messages'),
+                onTap: () {},
+              ),
+              PopupMenuItem(
+                textStyle: TextStyle(color: Colors.white),
+                child: Text('Payments'),
+                onTap: () {},
+              ),
+              PopupMenuItem(
+                textStyle: TextStyle(color: Colors.white),
+                child: Text('Settings'),
+                onTap: () {},
+              ),
+              PopupMenuItem(
+                textStyle: TextStyle(color: Colors.white),
+                child: Text('Logout'),
+                onTap: () async {
+                  await GoogleSignIn().signOut();
+                  FirebaseAuth.instance.signOut();
+                },
+              ),
+            ],
+            icon: Icon(
+              color: Color(0xff728088),
+              Icons.more_vert,
+            ),
+          ),
         ],
         bottom: TabBar(
           isScrollable: true,
@@ -73,28 +122,26 @@ class _HomePageState extends State<HomePage>
           labelColor: Color(0xff168670),
           unselectedLabelColor: Color(0xff728088),
           indicatorColor: Color(0xff168670),
-          onTap: (index) {
-
-          },
+          onTap: (index) {},
           controller: _controller,
           tabs: [
             Container(
-              width: w*0.07,
+              width: w * 0.07,
               height: 40,
               child: Center(child: Icon(Icons.camera_alt_rounded)),
             ),
             Container(
-              width: w*0.24,
+              width: w * 0.24,
               height: 40,
               child: Center(child: Text("CHATS")),
             ),
             Container(
-              width: w*0.24,
+              width: w * 0.24,
               height: 40,
               child: Center(child: Text("STATUS")),
             ),
             Container(
-              width: w*0.24,
+              width: w * 0.24,
               height: 40,
               child: Center(child: Text("CALLS")),
             )
@@ -109,15 +156,11 @@ class _HomePageState extends State<HomePage>
               child: Text("Camera"),
             ),
           ),
-
           ChatPage(),
-
           Container(
-            child: Center(
-              child: Text("Status"),
-            )
-          ),
-
+              child: Center(
+            child: Text("Status"),
+          )),
           Container(
             child: Center(
               child: Text("Calls"),
@@ -128,40 +171,35 @@ class _HomePageState extends State<HomePage>
       floatingActionButton: Visibility(
         visible: checkVisibility,
         child: Stack(
-          clipBehavior: Clip.none, children: [
+          clipBehavior: Clip.none,
+          children: [
             Positioned(
-              bottom: editBottom,
+                bottom: editBottom,
                 left: 5,
                 width: 45,
                 child: FloatingActionButton(
-                  onPressed: (){
-
-                  },
+                  backgroundColor: Color(0xff1c252c),
+                  onPressed: () {},
                   child: Icon(Icons.edit),
-                )
-            ),
+                )),
             Positioned(
                 child: FloatingActionButton(
-                  onPressed: (){
-
-                  },
-                  child: iconCondition(),
-                )
-            ),
+              backgroundColor: Color(0xff168670),
+              onPressed: () {},
+              child: iconCondition(),
+            )),
           ],
         ),
       ),
     );
   }
 
-  iconCondition(){
-    if(_selectedIndex==1){
+  iconCondition() {
+    if (_selectedIndex == 1) {
       return Icon(Icons.message);
-    }
-    else if(_selectedIndex==2){
+    } else if (_selectedIndex == 2) {
       return Icon(Icons.camera_alt_rounded);
-    }
-    else if(_selectedIndex==3){
+    } else if (_selectedIndex == 3) {
       return Icon(Icons.add_call);
     }
   }
