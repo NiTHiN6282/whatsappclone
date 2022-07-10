@@ -1,5 +1,8 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter/src/foundation/key.dart';
 import 'package:flutter/src/widgets/framework.dart';
 
@@ -16,6 +19,18 @@ class MessagePage extends StatefulWidget {
 
 class _MessagePageState extends State<MessagePage> {
   TextEditingController messageController = TextEditingController();
+  ScrollController listController = ScrollController();
+
+  @override
+  void initState() {
+    Timer(Duration(milliseconds: 100), () {
+      listController.jumpTo(listController.position.maxScrollExtent);
+      Timer(Duration(milliseconds: 100), () {
+        listController.jumpTo(listController.position.maxScrollExtent);
+      });
+    });
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -23,6 +38,20 @@ class _MessagePageState extends State<MessagePage> {
     double scrHeight = MediaQuery.of(context).size.height;
     return SafeArea(
       child: Scaffold(
+        appBar: AppBar(
+          backgroundColor: Color(0xff1e2d34),
+          actions: [
+            Icon(color: Color(0xff788185), size: 23, Icons.videocam),
+            SizedBox(
+              width: 15,
+            ),
+            Icon(color: Color(0xff788185), size: 23, Icons.call),
+            SizedBox(
+              width: 15,
+            ),
+            Icon(Icons.more_vert)
+          ],
+        ),
         body: SizedBox(
           height: scrHeight,
           width: scrWidth,
@@ -38,68 +67,139 @@ class _MessagePageState extends State<MessagePage> {
                   return Column(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Expanded(
-                        child: ListView.builder(
-                          itemCount: data.length,
-                          shrinkWrap: true,
-                          padding: const EdgeInsets.only(top: 10, bottom: 10),
-                          physics: const ClampingScrollPhysics(),
-                          itemBuilder: (context, index) {
-                            if ((data[index]["senderId"] == widget.uid ||
-                                    data[index]["receiverId"] == widget.uid) &&
-                                (data[index]["senderId"] == widget.rid ||
-                                    data[index]["receiverId"] == widget.rid)) {
-                              return Container(
-                                padding: const EdgeInsets.only(
-                                    left: 14, right: 14, top: 10, bottom: 10),
-                                child: Align(
-                                  alignment:
-                                      (data[index]["senderId"] == widget.rid
-                                          ? Alignment.topLeft
-                                          : Alignment.topRight),
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(20),
-                                      color:
-                                          (data[index]["senderId"] == widget.rid
-                                              ? Colors.grey.shade200
-                                              : Colors.blue[200]),
-                                    ),
-                                    padding: const EdgeInsets.all(16),
-                                    child: Text(
-                                      data[index]["message"],
-                                      style: const TextStyle(fontSize: 15),
+                      Container(
+                        child: Expanded(
+                          child: ListView.builder(
+                            controller: listController,
+                            itemCount: data.length,
+                            shrinkWrap: true,
+                            padding: const EdgeInsets.only(top: 10, bottom: 10),
+                            physics: const ClampingScrollPhysics(),
+                            itemBuilder: (context, index) {
+                              if ((data[index]["senderId"] == widget.uid ||
+                                      data[index]["receiverId"] ==
+                                          widget.uid) &&
+                                  (data[index]["senderId"] == widget.rid ||
+                                      data[index]["receiverId"] ==
+                                          widget.rid)) {
+                                Timestamp t = data[index]["sendTime"];
+                                DateTime d = t.toDate();
+                                return Container(
+                                  padding: const EdgeInsets.only(
+                                      left: 14, right: 14, top: 10, bottom: 10),
+                                  child: Align(
+                                    alignment:
+                                        (data[index]["senderId"] == widget.rid
+                                            ? Alignment.topLeft
+                                            : Alignment.topRight),
+                                    child: UnconstrainedBox(
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(20),
+                                          color: (data[index]["senderId"] ==
+                                                  widget.rid
+                                              ? Color(0xff1F4230)
+                                              : Color(0xff019986)),
+                                        ),
+                                        padding: const EdgeInsets.only(
+                                            left: 10,
+                                            right: 10,
+                                            top: 10,
+                                            bottom: 10),
+                                        child: Row(
+                                          children: [
+                                            Column(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              children: [
+                                                Text(
+                                                  data[index]["message"],
+                                                  style: const TextStyle(
+                                                      color: Colors.white,
+                                                      fontSize: 15),
+                                                ),
+                                              ],
+                                            ),
+                                            SizedBox(
+                                              width: 8,
+                                            ),
+                                            Column(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              children: [
+                                                SizedBox(),
+                                                Text(
+                                                    style:
+                                                        TextStyle(fontSize: 10),
+                                                    d.hour >= 13
+                                                        ? "${d.hour - 12}:${d.minute}"
+                                                        : "${d.hour}:${d.minute}"),
+                                              ],
+                                            ),
+                                          ],
+                                        ),
+                                      ),
                                     ),
                                   ),
-                                ),
-                              );
-                            }
-                            return SizedBox();
-                          },
+                                );
+                              }
+                              return SizedBox();
+                            },
+                          ),
                         ),
                       ),
                       Row(
                         children: [
                           Container(
-                            width: scrWidth / 1.25,
+                            padding: EdgeInsets.only(left: 4),
                             decoration: BoxDecoration(
-                                color: Colors.grey,
-                                borderRadius: BorderRadius.circular(20)),
-                            margin: EdgeInsets.only(left: 4, bottom: 4),
+                              borderRadius: BorderRadius.circular(20),
+                              color: Color(0xff1e2d34),
+                            ),
                             child: Row(
                               children: [
-                                const SizedBox(
-                                  width: 10,
+                                Icon(
+                                    color: Color(0xff8796a0),
+                                    Icons.emoji_emotions),
+                                SizedBox(
+                                  width: 4,
                                 ),
-                                Icon(Icons.face),
-                                Flexible(
-                                  child: TextFormField(
-                                    onTap: () {},
-                                    controller: messageController,
-                                    decoration: const InputDecoration(
-                                        border: InputBorder.none),
-                                  ),
-                                ),
+                                Container(
+                                    width: 298,
+                                    child: TextField(
+                                      style: TextStyle(color: Colors.white),
+                                      onTap: () {
+                                        Timer(Duration(milliseconds: 100), () {
+                                          listController.jumpTo(listController
+                                              .position.maxScrollExtent);
+                                          Timer(Duration(milliseconds: 100),
+                                              () {
+                                            listController.jumpTo(listController
+                                                .position.maxScrollExtent);
+                                            Timer(Duration(milliseconds: 100),
+                                                () {
+                                              listController.jumpTo(
+                                                  listController.position
+                                                      .maxScrollExtent);
+                                              Timer(Duration(milliseconds: 100),
+                                                  () {
+                                                listController.jumpTo(
+                                                    listController.position
+                                                        .maxScrollExtent);
+                                              });
+                                            });
+                                          });
+                                        });
+                                      },
+                                      controller: messageController,
+                                      decoration: InputDecoration(
+                                          hintText: 'Message',
+                                          hintStyle: TextStyle(
+                                              color: Color(0xff8796a0)),
+                                          border: InputBorder.none),
+                                    )),
                               ],
                             ),
                           ),
@@ -107,21 +207,22 @@ class _MessagePageState extends State<MessagePage> {
                             width: scrWidth / 50,
                           ),
                           Container(
+                            padding: EdgeInsets.all(3),
                             decoration: BoxDecoration(
-                                color: Colors.green,
-                                borderRadius: BorderRadius.circular(40)),
-                            child: Row(
-                              children: [
-                                SizedBox(
-                                  width: scrWidth / 300,
-                                ),
-                                IconButton(
-                                    onPressed: () {
-                                      sendMessage();
-                                      messageController.clear();
-                                    },
-                                    icon: const Icon(Icons.send_sharp)),
-                              ],
+                              borderRadius: BorderRadius.circular(100),
+                              color: Color(0xff01a984),
+                            ),
+                            child: IconButton(
+                              color: Colors.white,
+                              icon: Icon(Icons.send),
+                              onPressed: () {
+                                sendMessage();
+                                messageController.clear();
+                                Timer(Duration(milliseconds: 100), () {
+                                  listController.jumpTo(
+                                      listController.position.maxScrollExtent);
+                                });
+                              },
                             ),
                           ),
                         ],
