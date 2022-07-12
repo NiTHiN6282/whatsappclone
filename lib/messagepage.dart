@@ -27,18 +27,7 @@ class MessagePage extends StatefulWidget {
 
 class _MessagePageState extends State<MessagePage> {
   TextEditingController messageController = TextEditingController();
-  ScrollController listController = ScrollController();
 
-  @override
-  void initState() {
-    Timer(Duration(milliseconds: 100), () {
-      listController.jumpTo(listController.position.maxScrollExtent);
-      Timer(Duration(milliseconds: 100), () {
-        listController.jumpTo(listController.position.maxScrollExtent);
-      });
-    });
-    super.initState();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -82,7 +71,7 @@ class _MessagePageState extends State<MessagePage> {
           height: scrHeight,
           width: scrWidth,
           child: StreamBuilder<QuerySnapshot>(
-              stream: FirebaseFirestore.instance.collection("chat").snapshots(),
+              stream: FirebaseFirestore.instance.collection("chat").orderBy('sendTime',descending: true).snapshots(),
               builder: (context, snapshot) {
                 if (!snapshot.hasData) {
                   return Text("No messages");
@@ -98,7 +87,7 @@ class _MessagePageState extends State<MessagePage> {
                       Container(
                         child: Expanded(
                           child: ListView.builder(
-                            controller: listController,
+                            reverse: true,
                             itemCount: data.length,
                             shrinkWrap: true,
                             padding: const EdgeInsets.only(top: 10, bottom: 10),
@@ -198,29 +187,6 @@ class _MessagePageState extends State<MessagePage> {
                                     width: 298,
                                     child: TextField(
                                       style: TextStyle(color: Colors.white),
-                                      onTap: () {
-                                        Timer(Duration(milliseconds: 100), () {
-                                          listController.jumpTo(listController
-                                              .position.maxScrollExtent);
-                                          Timer(Duration(milliseconds: 100),
-                                              () {
-                                            listController.jumpTo(listController
-                                                .position.maxScrollExtent);
-                                            Timer(Duration(milliseconds: 100),
-                                                () {
-                                              listController.jumpTo(
-                                                  listController.position
-                                                      .maxScrollExtent);
-                                              Timer(Duration(milliseconds: 100),
-                                                  () {
-                                                listController.jumpTo(
-                                                    listController.position
-                                                        .maxScrollExtent);
-                                              });
-                                            });
-                                          });
-                                        });
-                                      },
                                       controller: messageController,
                                       decoration: InputDecoration(
                                           hintText: 'Message',
@@ -246,10 +212,6 @@ class _MessagePageState extends State<MessagePage> {
                               onPressed: () {
                                 sendMessage();
                                 messageController.clear();
-                                Timer(Duration(milliseconds: 100), () {
-                                  listController.jumpTo(
-                                      listController.position.maxScrollExtent);
-                                });
                               },
                             ),
                           ),
