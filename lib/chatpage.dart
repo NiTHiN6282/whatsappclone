@@ -75,7 +75,7 @@ class _ChatPageState extends State<ChatPage> {
                                               ['username'],
                                           style: TextStyle(
                                               fontSize: 16,
-                                              color: Color(0xffafb3b5)),
+                                              color: Colors.white),
                                         ),
                                         // SizedBox(
                                         //   height: 12,
