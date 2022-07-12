@@ -1,8 +1,10 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 
 class MessagePage extends StatefulWidget {
@@ -14,10 +16,10 @@ class MessagePage extends StatefulWidget {
 
   MessagePage(
       {Key? key,
-        required this.rid,
-        required this.uid,
-        required this.profilePic,
-        required this.name})
+      required this.rid,
+      required this.uid,
+      required this.profilePic,
+      required this.name})
       : super(key: key);
 
   @override
@@ -27,6 +29,7 @@ class MessagePage extends StatefulWidget {
 class _MessagePageState extends State<MessagePage> {
   TextEditingController messageController = TextEditingController();
   bool emojiShowing = false;
+  bool keyboardShowing = false;
 
   _onEmojiSelected(Emoji emoji) {
     messageController
@@ -53,6 +56,7 @@ class _MessagePageState extends State<MessagePage> {
             fit: BoxFit.cover),
       ),
       child: Scaffold(
+        resizeToAvoidBottomInset: false,
         backgroundColor: Colors.transparent,
         appBar: AppBar(
           title: Text(
@@ -112,26 +116,26 @@ class _MessagePageState extends State<MessagePage> {
                             Container(
                               child: Expanded(
                                 child: ListView.builder(
+                                  addAutomaticKeepAlives: true,
+                                  cacheExtent: double.infinity,
                                   reverse: true,
                                   itemCount: data.length,
-                                  shrinkWrap: true,
                                   padding: const EdgeInsets.only(
                                       top: 10, bottom: 10),
-                                  physics: const ClampingScrollPhysics(),
                                   itemBuilder: (context, index) {
                                     if ((data[index]["senderId"] ==
-                                        widget.uid ||
-                                        data[index]["receiverId"] ==
-                                            widget.uid) &&
+                                                widget.uid ||
+                                            data[index]["receiverId"] ==
+                                                widget.uid) &&
                                         (data[index]["senderId"] ==
-                                            widget.rid ||
+                                                widget.rid ||
                                             data[index]["receiverId"] ==
                                                 widget.rid)) {
                                       Timestamp t = data[index]["sendTime"];
                                       DateTime d = t.toDate();
                                       return Align(
                                         alignment: (data[index]["senderId"] ==
-                                            widget.rid
+                                                widget.rid
                                             ? Alignment.topLeft
                                             : Alignment.topRight),
                                         child: ConstrainedBox(
@@ -142,9 +146,9 @@ class _MessagePageState extends State<MessagePage> {
                                             elevation: 1,
                                             shape: RoundedRectangleBorder(
                                                 borderRadius:
-                                                BorderRadius.circular(8)),
+                                                    BorderRadius.circular(8)),
                                             color: (data[index]["senderId"] ==
-                                                widget.rid
+                                                    widget.rid
                                                 ? Color(0xff18252a)
                                                 : Color(0xff015c4b)),
                                             margin: EdgeInsets.symmetric(
@@ -153,7 +157,7 @@ class _MessagePageState extends State<MessagePage> {
                                               children: [
                                                 Padding(
                                                   padding:
-                                                  const EdgeInsets.only(
+                                                      const EdgeInsets.only(
                                                     left: 10,
                                                     right: 30,
                                                     top: 5,
@@ -177,12 +181,12 @@ class _MessagePageState extends State<MessagePage> {
                                                             fontSize: 13,
                                                             // 0xff6cb0a6
                                                             color: (data[index][
-                                                            "senderId"] ==
-                                                                widget.rid
+                                                                        "senderId"] ==
+                                                                    widget.rid
                                                                 ? Color(
-                                                                0xff6f7a83)
+                                                                    0xff6f7a83)
                                                                 : Color(
-                                                                0xff6cb0a6)),
+                                                                    0xff6cb0a6)),
                                                           ),
                                                           DateFormat("h:mm a")
                                                               .format(d)
@@ -235,6 +239,7 @@ class _MessagePageState extends State<MessagePage> {
                               onPressed: () {
                                 setState(() {
                                   emojiShowing = !emojiShowing;
+                                  keyboardShowing = false;
                                   FocusManager.instance.primaryFocus?.unfocus();
                                 });
                               },
@@ -247,11 +252,15 @@ class _MessagePageState extends State<MessagePage> {
                           Expanded(
                             child: Padding(
                               padding:
-                              const EdgeInsets.symmetric(vertical: 8.0),
+                                  const EdgeInsets.symmetric(vertical: 8.0),
                               child: TextField(
                                   onTap: () {
                                     emojiShowing = false;
+                                    keyboardShowing = true;
                                     setState(() {});
+                                    Timer(Duration(milliseconds: 700), () {
+                                      keyboardShowing = false;
+                                    });
                                   },
                                   controller: messageController,
                                   style: const TextStyle(
@@ -260,11 +269,8 @@ class _MessagePageState extends State<MessagePage> {
                                       border: InputBorder.none,
                                       hintText: 'Message',
                                       hintStyle: TextStyle(
-                                        color: Color(0xff6f7a83),
-                                        fontSize: 19
-                                      )
-                                  )
-                              ),
+                                          color: Color(0xff6f7a83),
+                                          fontSize: 19))),
                             ),
                           ),
                         ],
@@ -290,6 +296,12 @@ class _MessagePageState extends State<MessagePage> {
                     ),
                   ],
                 )),
+            Offstage(
+              offstage: !keyboardShowing,
+              child: SizedBox(
+                height: 250,
+              ),
+            ),
             Offstage(
               offstage: !emojiShowing,
               child: SizedBox(
