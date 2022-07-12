@@ -10,7 +10,15 @@ class MessagePage extends StatefulWidget {
   String uid;
   String rid;
 
-  MessagePage({Key? key, required this.rid, required this.uid})
+  String profilePic;
+  String name;
+
+  MessagePage(
+      {Key? key,
+      required this.rid,
+      required this.uid,
+      required this.profilePic,
+      required this.name})
       : super(key: key);
 
   @override
@@ -39,13 +47,31 @@ class _MessagePageState extends State<MessagePage> {
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
+          title: Text(
+            widget.name,
+            style: TextStyle(fontSize: 18),
+          ),
+          leadingWidth: 100,
           backgroundColor: Color(0xff1e2d34),
+          leading: Row(
+            children: [
+              IconButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  icon: Icon(Icons.arrow_back_ios_new)),
+              CircleAvatar(
+                backgroundImage: NetworkImage(widget.profilePic),
+                // maxRadius: 10,
+              ),
+            ],
+          ),
           actions: [
-            Icon(color: Color(0xff788185), size: 23, Icons.videocam),
+            Icon(size: 23, Icons.videocam),
             SizedBox(
               width: 15,
             ),
-            Icon(color: Color(0xff788185), size: 23, Icons.call),
+            Icon(size: 20, Icons.call),
             SizedBox(
               width: 15,
             ),
@@ -64,6 +90,8 @@ class _MessagePageState extends State<MessagePage> {
                   return Text("No messages");
                 } else {
                   var data = snapshot.data!.docs;
+                  print(widget.rid);
+
                   return Column(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [

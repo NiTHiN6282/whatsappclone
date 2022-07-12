@@ -40,8 +40,12 @@ class _ChatPageState extends State<ChatPage> {
                               context,
                               MaterialPageRoute(
                                 builder: (context) => MessagePage(
-                                    rid: snapshot.data!.docs[index]['userid'],
-                                    uid: userId),
+                                  rid: snapshot.data!.docs[index]['userid'],
+                                  uid: userId,
+                                  profilePic: snapshot.data!.docs[index]
+                                      ['userimage'],
+                                  name: snapshot.data!.docs[index]['username'],
+                                ),
                               ));
                         },
                         child: Container(
