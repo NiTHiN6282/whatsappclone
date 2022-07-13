@@ -289,7 +289,9 @@ class _MessagePageState extends State<MessagePage> {
                         color: Colors.white,
                         icon: Icon(Icons.send),
                         onPressed: () {
-                          sendMessage();
+                          if(messageController.text.isNotEmpty){
+                            sendMessage();
+                          }
                           messageController.clear();
                         },
                       ),
