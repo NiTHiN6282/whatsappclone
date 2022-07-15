@@ -1,4 +1,5 @@
 import 'package:badges/badges.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:whatsappclone/main.dart';
 import 'package:whatsappclone/status/statusview.dart';
@@ -40,7 +41,7 @@ class _StatusPageState extends State<StatusPage> {
                         ),
                         child: CircleAvatar(
                           radius: 25,
-                          backgroundImage: NetworkImage(userData.photoURL),
+                          backgroundImage: CachedNetworkImageProvider(userData.photoURL),
                         ),
                       ),
                       SizedBox(
@@ -55,7 +56,7 @@ class _StatusPageState extends State<StatusPage> {
                           ),
                           SizedBox(height: 5),
                           Text(
-                            "Tap a add status update",
+                            "Tap to add status update",
                             style: TextStyle(color: Colors.grey, fontSize: 14),
                           )
                         ],

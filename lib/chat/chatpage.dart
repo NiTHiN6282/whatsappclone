@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -61,8 +62,9 @@ class _ChatPageState extends State<ChatPage> {
                                   children: [
                                     CircleAvatar(
                                       radius: 27,
-                                      backgroundImage: NetworkImage(snapshot
-                                          .data!.docs[index]['userimage']),
+                                      backgroundImage:
+                                          CachedNetworkImageProvider(snapshot
+                                              .data!.docs[index]['userimage']),
                                     ),
                                     SizedBox(
                                       width: 20,
