@@ -1,8 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:whatsappclone/messagepage.dart';
+import 'package:whatsappclone/chat/messagepage.dart';
 
-import 'main.dart';
+import '../main.dart';
 
 class ChatPage extends StatefulWidget {
   const ChatPage({Key? key}) : super(key: key);
@@ -28,7 +29,7 @@ class _ChatPageState extends State<ChatPage> {
               return Text("No Chats");
             } else {
               return ListView.builder(
-                  physics: NeverScrollableScrollPhysics(),
+                  physics: ClampingScrollPhysics(),
                   shrinkWrap: true,
                   itemCount: snapshot.data!.docs.length,
                   itemBuilder: (context, index) {
@@ -38,7 +39,7 @@ class _ChatPageState extends State<ChatPage> {
                         onTap: () {
                           Navigator.push(
                               context,
-                              MaterialPageRoute(
+                              CupertinoPageRoute(
                                 builder: (context) => MessagePage(
                                   rid: snapshot.data!.docs[index]['userid'],
                                   uid: userId,

@@ -1,7 +1,10 @@
+import 'dart:async';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'chatpage.dart';
+import 'package:whatsappclone/status/statuspage.dart';
+import 'chat/chatpage.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -157,10 +160,7 @@ class _HomePageState extends State<HomePage>
             ),
           ),
           ChatPage(),
-          Container(
-              child: Center(
-            child: Text("Status"),
-          )),
+          StatusPage(),
           Container(
             child: Center(
               child: Text("Calls"),
