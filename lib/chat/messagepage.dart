@@ -6,6 +6,7 @@ import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
+import 'package:whatsappclone/main.dart';
 
 class MessagePage extends StatefulWidget {
   String uid;
@@ -98,6 +99,7 @@ class _MessagePageState extends State<MessagePage> {
                 child: StreamBuilder<QuerySnapshot>(
                     stream: FirebaseFirestore.instance
                         .collection("chat")
+                        .where("senderId", whereIn: [userId, widget.rid])
                         .orderBy('sendTime', descending: true)
                         .snapshots(),
                     builder: (context, snapshot) {
@@ -133,6 +135,14 @@ class _MessagePageState extends State<MessagePage> {
                                                 widget.rid)) {
                                       Timestamp t = data[index]["sendTime"];
                                       DateTime d = t.toDate();
+
+                                      if (data[index]['receiverId'] == userId) {
+                                        FirebaseFirestore.instance
+                                            .collection('chat')
+                                            .doc(data[index]['msgId'])
+                                            .update({"isRead": true});
+                                      }
+
                                       return Align(
                                         alignment: (data[index]["senderId"] ==
                                                 widget.rid
@@ -194,10 +204,18 @@ class _MessagePageState extends State<MessagePage> {
                                                       SizedBox(
                                                         width: 5,
                                                       ),
-                                                      // Icon(
-                                                      //   Icons.done_all,
-                                                      //   size: 20,
-                                                      // ),
+                                                      data[index]['senderId'] ==
+                                                              userId
+                                                          ? Icon(
+                                                              Icons.done_all,
+                                                              color: data[index]
+                                                                      ['isRead']
+                                                                  ? Colors.blue
+                                                                  : Colors.grey[
+                                                                      600],
+                                                              size: 20,
+                                                            )
+                                                          : SizedBox(),
                                                     ],
                                                   ),
                                                 ),
@@ -289,7 +307,7 @@ class _MessagePageState extends State<MessagePage> {
                         color: Colors.white,
                         icon: Icon(Icons.send),
                         onPressed: () {
-                          if(messageController.text.isNotEmpty){
+                          if (messageController.text.isNotEmpty) {
                             sendMessage();
                           }
                           messageController.clear();
@@ -349,14 +367,14 @@ class _MessagePageState extends State<MessagePage> {
   }
 
   sendMessage() {
-    FirebaseFirestore.instance
-        .collection('chat')
-        .doc(DateTime.now().toString())
-        .set({
+    FirebaseFirestore.instance.collection('chat').add({
       "message": messageController.text,
       "receiverId": widget.rid,
       "senderId": widget.uid,
-      "sendTime": DateTime.now()
+      "sendTime": DateTime.now(),
+      "isRead": false,
+    }).then((value) {
+      value.update({"msgId": value.id});
     });
   }
 }
