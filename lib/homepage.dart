@@ -187,7 +187,12 @@ class _HomePageState extends State<HomePage>
                 child: FloatingActionButton(
               heroTag: "btn2",
               backgroundColor: Color(0xff168670),
-              onPressed: () {},
+              onPressed: () {
+                if (_selectedIndex == 1) {
+                } else if (_selectedIndex == 2) {
+                  print("clicked");
+                } else if (_selectedIndex == 3) {}
+              },
               child: iconCondition(),
             )),
           ],
