@@ -4,6 +4,10 @@ import 'package:story_view/story_view.dart';
 import 'package:whatsappclone/main.dart';
 
 class StatusViewPage extends StatefulWidget {
+  var id;
+
+  StatusViewPage({Key? key, this.id}) : super(key: key);
+
   @override
   _StatusViewPageState createState() => _StatusViewPageState();
 }
@@ -15,29 +19,27 @@ class _StatusViewPageState extends State<StatusViewPage> {
 
   getList() {
     FirebaseFirestore.instance
-        .collection('user')
-        .doc(userId)
+        .collection('status')
+        .doc(widget.id)
         .snapshots()
         .listen((event) {
       statusList = event.get('status');
       if (mounted) {
         setState(() {});
 
-        print("statusList: "+statusList.toString());
-        for (int i = 0; i < statusList.length ; i++) {
+        print("statusList: " + statusList.toString());
+        for (int i = 0; i < statusList.length; i++) {
           setState(() {
-            if(statusList[i]['type'] == 'image'){
+            if (statusList[i]['type'] == 'image') {
               stories.add(StoryItem.pageImage(
-                  url:
-                  statusList[i]['url'],
+                  url: statusList[i]['url'], controller: storyController));
+            } else if (statusList[i]['type'] == 'text') {
+              stories.add(StoryItem.text(
+                  title: statusList[i]['text'], backgroundColor: Colors.blue));
+            } else if (statusList[i]['type'] == 'video') {
+              stories.add(StoryItem.pageVideo(statusList[i]['url'],
                   controller: storyController));
-            }else if(statusList[i]['type'] == 'text'){
-              stories.add(StoryItem.text(title: statusList[i]['text'], backgroundColor: Colors.blue
-              ));
-            }else if(statusList[i]['type'] == 'video'){
-             stories.add(StoryItem.pageVideo(statusList[i]['url'], controller: storyController));
             }
-
           });
         }
       }
