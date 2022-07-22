@@ -2,6 +2,7 @@ import 'package:badges/badges.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:status_view/status_view.dart';
 import 'package:whatsappclone/main.dart';
 import 'package:intl/intl.dart';
 import 'package:whatsappclone/status/statusview.dart';
@@ -14,6 +15,24 @@ class StatusPage extends StatefulWidget {
 }
 
 class _StatusPageState extends State<StatusPage> {
+  List statusList = [];
+
+  getList() {
+    FirebaseFirestore.instance
+        .collection('status')
+        .doc(userId)
+        .snapshots()
+        .listen((event) {
+      statusList = event.get('status');
+    });
+  }
+
+  @override
+  void initState() {
+    getList();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     print(userData);
@@ -40,6 +59,7 @@ class _StatusPageState extends State<StatusPage> {
                     children: [
                       Badge(
                         toAnimate: false,
+                        showBadge: statusList.isEmpty ? true : false,
                         position: BadgePosition(bottom: 1, start: 30),
                         badgeColor: Color(0xff168670),
                         badgeContent: Icon(
@@ -47,11 +67,33 @@ class _StatusPageState extends State<StatusPage> {
                           size: 13,
                           color: Colors.white,
                         ),
-                        child: CircleAvatar(
-                          radius: 25,
-                          backgroundImage:
-                              CachedNetworkImageProvider(userData.photoURL),
-                        ),
+                        child: statusList.isEmpty
+                            ? CircleAvatar(
+                                radius: 25,
+                                backgroundImage: CachedNetworkImageProvider(
+                                    userData.photoURL),
+                              )
+                            : StreamBuilder<QuerySnapshot>(
+                                stream: FirebaseFirestore.instance
+                                    .collection('status')
+                                    .where("senderId", isEqualTo: userId)
+                                    .snapshots(),
+                                builder: (context, snapshot) {
+                                  var data = snapshot.data!.docs;
+                                  var statlen = data[0]['status'].length;
+                                  return StatusView(
+                                    radius: 30,
+                                    spacing: 15,
+                                    strokeWidth: 2,
+                                    // indexOfSeenStatus: 2,
+                                    numberOfStatus: data[0]['status'].length,
+                                    padding: 4,
+                                    centerImageUrl: data[0]['status']
+                                        [statlen - 1]['url'],
+                                    seenColor: Colors.grey,
+                                    unSeenColor: Colors.green,
+                                  );
+                                }),
                       ),
                       SizedBox(
                         width: 15,
@@ -114,13 +156,21 @@ class _StatusPageState extends State<StatusPage> {
                                     ));
                               },
                               child: Container(
+                                padding: EdgeInsets.only(bottom: 10),
                                 child: Row(
                                   children: [
-                                    CircleAvatar(
-                                      radius: 27,
-                                      backgroundImage:
-                                          CachedNetworkImageProvider(data[index]
-                                              ['status'][statlen - 1]['url']),
+                                    StatusView(
+                                      radius: 30,
+                                      spacing: 15,
+                                      strokeWidth: 2,
+                                      // indexOfSeenStatus: 2,
+                                      numberOfStatus:
+                                          data[index]['status'].length,
+                                      padding: 4,
+                                      centerImageUrl: data[index]['status']
+                                          [statlen - 1]['url'],
+                                      seenColor: Colors.grey,
+                                      unSeenColor: Colors.green,
                                     ),
                                     SizedBox(
                                       width: 20,
