@@ -79,20 +79,29 @@ class _StatusPageState extends State<StatusPage> {
                                     .where("senderId", isEqualTo: userId)
                                     .snapshots(),
                                 builder: (context, snapshot) {
-                                  var data = snapshot.data!.docs;
-                                  var statlen = data[0]['status'].length;
-                                  return StatusView(
-                                    radius: 30,
-                                    spacing: 15,
-                                    strokeWidth: 2,
-                                    // indexOfSeenStatus: 2,
-                                    numberOfStatus: data[0]['status'].length,
-                                    padding: 4,
-                                    centerImageUrl: data[0]['status']
-                                        [statlen - 1]['url'],
-                                    seenColor: Colors.grey,
-                                    unSeenColor: Colors.green,
-                                  );
+                                  var data;
+                                  var statlen;
+                                  if (!snapshot.hasData) {
+                                    return Text("No messages");
+                                  } else if (snapshot.hasData &&
+                                      snapshot.data!.docs.isEmpty) {
+                                    return Text("No messages");
+                                  } else {
+                                    data = snapshot.data!.docs;
+                                    statlen = data[0]['status'].length;
+                                    return StatusView(
+                                      radius: 30,
+                                      spacing: 15,
+                                      strokeWidth: 2,
+                                      // indexOfSeenStatus: 2,
+                                      numberOfStatus: data[0]['status'].length,
+                                      padding: 4,
+                                      centerImageUrl: data[0]['status']
+                                          [statlen - 1]['url'],
+                                      seenColor: Colors.grey,
+                                      unSeenColor: Colors.green,
+                                    );
+                                  }
                                 }),
                       ),
                       SizedBox(
