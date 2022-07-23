@@ -1,10 +1,17 @@
-import 'dart:async';
+import 'dart:io';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:whatsappclone/status/statuspage.dart';
+
 import 'chat/chatpage.dart';
+import 'main.dart';
+
+File? image;
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -15,10 +22,14 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage>
     with SingleTickerProviderStateMixin {
+  final ImagePicker _picker = ImagePicker();
+  dynamic url;
+  String? imagePath;
   late TabController _controller;
   var checkVisibility = true;
   int _selectedIndex = 1;
   double editBottom = 0;
+  List statusList = [];
 
   @override
   void initState() {
@@ -173,16 +184,18 @@ class _HomePageState extends State<HomePage>
         child: Stack(
           clipBehavior: Clip.none,
           children: [
-            Positioned(
-                bottom: editBottom,
-                left: 5,
-                width: 45,
-                child: FloatingActionButton(
-                  heroTag: "btn1",
-                  backgroundColor: Color(0xff1c252c),
-                  onPressed: () {},
-                  child: Icon(Icons.edit),
-                )),
+            image == null
+                ? Positioned(
+                    bottom: editBottom,
+                    left: 5,
+                    width: 45,
+                    child: FloatingActionButton(
+                      heroTag: "btn1",
+                      backgroundColor: Color(0xff1c252c),
+                      onPressed: () {},
+                      child: Icon(Icons.edit),
+                    ))
+                : SizedBox(),
             Positioned(
                 child: FloatingActionButton(
               heroTag: "btn2",
@@ -190,7 +203,11 @@ class _HomePageState extends State<HomePage>
               onPressed: () {
                 if (_selectedIndex == 1) {
                 } else if (_selectedIndex == 2) {
-                  print("clicked");
+                  if (image == null) {
+                    imgChooser();
+                  } else {
+                    uploadToStorage();
+                  }
                 } else if (_selectedIndex == 3) {}
               },
               child: iconCondition(),
@@ -205,9 +222,70 @@ class _HomePageState extends State<HomePage>
     if (_selectedIndex == 1) {
       return Icon(Icons.message);
     } else if (_selectedIndex == 2) {
-      return Icon(Icons.camera_alt_rounded);
+      return image == null ? Icon(Icons.camera_alt_rounded) : Icon(Icons.done);
     } else if (_selectedIndex == 3) {
       return Icon(Icons.add_call);
     }
+  }
+
+  imgPicker(ImageSource filePath) async {
+    XFile? file = await _picker.pickImage(source: filePath);
+    if (file != null) {
+      image = File(file.path);
+      setState(() {});
+    }
+  }
+
+  uploadToStorage() {
+    String fileName = DateTime.now().toString();
+
+    var ref = FirebaseStorage.instance.ref().child('status/$fileName');
+    UploadTask uploadTask = ref.putFile(File(image!.path));
+
+    uploadTask.then((res) async {
+      url = (await ref.getDownloadURL()).toString();
+      statusList.add({
+        'type': "image",
+        'url': url,
+        'sendTime': DateTime.now(),
+      });
+    }).then((value) =>
+        FirebaseFirestore.instance.collection('status').doc(userId).update({
+          'SenderName': userData.displayName,
+          'senderId': userId,
+          'viewed': [],
+          'status': FieldValue.arrayUnion(statusList)
+        }));
+    setState(() {
+      image = null;
+    });
+  }
+
+  imgChooser() {
+    showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+              title: const Text('Alert'),
+              content: const Text('Choose a option'),
+              actions: [
+                TextButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+
+                      setState(() {
+                        imgPicker(ImageSource.camera);
+                      });
+                    },
+                    child: const Text('Camera')),
+                TextButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                      setState(() {
+                        imgPicker(ImageSource.gallery);
+                      });
+                    },
+                    child: const Text('Gallery'))
+              ],
+            ));
   }
 }

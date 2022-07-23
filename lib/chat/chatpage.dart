@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:whatsappclone/chat/messagepage.dart';
+import 'package:whatsappclone/homepage.dart';
 
 import '../main.dart';
 
@@ -14,6 +15,12 @@ class ChatPage extends StatefulWidget {
 }
 
 class _ChatPageState extends State<ChatPage> {
+  @override
+  void initState() {
+    image = null;
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(

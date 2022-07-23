@@ -43,6 +43,8 @@ dependencies:
   cached_network_image: ^3.2.1
   badges: ^2.0.3
   status_view: ^0.0.2
+  image_picker: ^0.8.5+3
+  firebase_storage: ^10.3.3
 
 dev_dependencies:
   flutter_test:
