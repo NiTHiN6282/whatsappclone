@@ -9,6 +9,8 @@ import 'package:whatsappclone/status/statusview.dart';
 
 import '../homepage.dart';
 
+List statusList = [];
+
 class StatusPage extends StatefulWidget {
   const StatusPage({Key? key}) : super(key: key);
 
@@ -17,8 +19,6 @@ class StatusPage extends StatefulWidget {
 }
 
 class _StatusPageState extends State<StatusPage> {
-  List statusList = [];
-
   getList() {
     FirebaseFirestore.instance
         .collection('status')
@@ -31,12 +31,15 @@ class _StatusPageState extends State<StatusPage> {
 
   @override
   void initState() {
+    statusList = [];
     getList();
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
+    var h = MediaQuery.of(context).size.height;
+    var w = MediaQuery.of(context).size.width;
     print(userData);
     return SafeArea(
       child: Scaffold(
@@ -50,13 +53,15 @@ class _StatusPageState extends State<StatusPage> {
                 children: [
                   InkWell(
                     onTap: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => StatusViewPage(
-                              id: userId,
-                            ),
-                          ));
+                      if (statusList.isNotEmpty) {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => StatusViewPage(
+                                id: userId,
+                              ),
+                            ));
+                      }
                     },
                     child: Container(
                       child: Row(
@@ -89,7 +94,23 @@ class _StatusPageState extends State<StatusPage> {
                                         return Text("No messages");
                                       } else if (snapshot.hasData &&
                                           snapshot.data!.docs.isEmpty) {
-                                        return Text("No messages");
+                                        return Badge(
+                                          toAnimate: false,
+                                          position: BadgePosition(
+                                              bottom: 1, start: 30),
+                                          badgeColor: Color(0xff168670),
+                                          badgeContent: Icon(
+                                            Icons.add,
+                                            size: 13,
+                                            color: Colors.white,
+                                          ),
+                                          child: CircleAvatar(
+                                            radius: 25,
+                                            backgroundImage:
+                                                CachedNetworkImageProvider(
+                                                    userData.photoURL),
+                                          ),
+                                        );
                                       } else {
                                         data = snapshot.data!.docs;
                                         statlen = data[0]['status'].length;
@@ -97,7 +118,7 @@ class _StatusPageState extends State<StatusPage> {
                                           radius: 30,
                                           spacing: 15,
                                           strokeWidth: 2,
-                                          // indexOfSeenStatus: 2,
+                                          indexOfSeenStatus: statlen,
                                           numberOfStatus:
                                               data[0]['status'].length,
                                           padding: 4,
@@ -225,12 +246,17 @@ class _StatusPageState extends State<StatusPage> {
               ),
             ),
             Positioned(
+                height: h,
+                width: w,
                 child: image == null
                     ? SizedBox()
-                    : Image.file(
-                        image!,
-                        height: MediaQuery.of(context).size.height,
-                        width: MediaQuery.of(context).size.width,
+                    : Container(
+                        color: Colors.black,
+                        child: Image.file(
+                          image!,
+                          height: MediaQuery.of(context).size.height,
+                          width: MediaQuery.of(context).size.width,
+                        ),
                       ))
           ],
         ),

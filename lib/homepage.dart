@@ -29,7 +29,8 @@ class _HomePageState extends State<HomePage>
   var checkVisibility = true;
   int _selectedIndex = 1;
   double editBottom = 0;
-  List statusList = [];
+
+  // List statusList = [];
 
   @override
   void initState() {
@@ -242,23 +243,28 @@ class _HomePageState extends State<HomePage>
     var ref = FirebaseStorage.instance.ref().child('status/$fileName');
     UploadTask uploadTask = ref.putFile(File(image!.path));
 
-    uploadTask.then((res) async {
-      url = (await ref.getDownloadURL()).toString();
-      statusList.add({
-        'type': "image",
-        'url': url,
-        'sendTime': DateTime.now(),
-      });
-    }).then((value) =>
-        FirebaseFirestore.instance.collection('status').doc(userId).update({
-          'SenderName': userData.displayName,
-          'senderId': userId,
-          'viewed': [],
-          'status': FieldValue.arrayUnion(statusList)
-        }));
-    setState(() {
-      image = null;
-    });
+    uploadTask
+        .then((res) async {
+          url = (await ref.getDownloadURL()).toString();
+          statusList.add({
+            'type': "image",
+            'url': url,
+            'sendTime': DateTime.now(),
+          });
+        })
+        .then((value) =>
+            FirebaseFirestore.instance.collection('status').doc(userId).set({
+              'SenderName': userData.displayName,
+              'senderId': userId,
+              'viewed': [],
+              'status': FieldValue.arrayUnion(statusList)
+            }))
+        .then((value) {
+          setState(() {
+            image = null;
+            print("status uploaded");
+          });
+        });
   }
 
   imgChooser() {
