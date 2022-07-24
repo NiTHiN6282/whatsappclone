@@ -6,13 +6,14 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:whatsappclone/login.dart';
 import 'package:whatsappclone/status/statuspage.dart';
 
 import 'chat/chatpage.dart';
 import 'main.dart';
 
 File? image;
-
+ 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
 
@@ -121,7 +122,13 @@ class _HomePageState extends State<HomePage>
                 child: Text('Logout'),
                 onTap: () async {
                   await GoogleSignIn().signOut();
-                  FirebaseAuth.instance.signOut();
+                  FirebaseAuth.instance
+                      .signOut()
+                      .then((value) => Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => LoginPage(),
+                          )));
                 },
               ),
             ],
