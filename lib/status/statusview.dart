@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:story_view/story_view.dart';
-import 'package:whatsappclone/main.dart';
 
 class StatusViewPage extends StatefulWidget {
   var id;
@@ -26,8 +25,6 @@ class _StatusViewPageState extends State<StatusViewPage> {
       statusList = event.get('status');
       if (mounted) {
         setState(() {});
-
-        print("statusList: " + statusList.toString());
         for (int i = 0; i < statusList.length; i++) {
           setState(() {
             if (statusList[i]['type'] == 'image') {
@@ -63,23 +60,22 @@ class _StatusViewPageState extends State<StatusViewPage> {
   Widget build(BuildContext context) {
     return Scaffold(
         body: Container(
-      child: StoryView(
-        onStoryShow: (s) {
-          print("Showing a story");
-        },
-        onComplete: () {
-          Navigator.pop(context);
-        },
-        onVerticalSwipeComplete: (direction) {
-          if (direction == Direction.down) {
-            Navigator.pop(context);
-          }
-        },
-        progressPosition: ProgressPosition.top,
-        repeat: true,
-        controller: storyController,
-        storyItems: [for (int i = 0; i < stories.length; i++) stories[i]],
-      ),
+      child: stories.isNotEmpty
+          ? StoryView(
+              onComplete: () {
+                Navigator.pop(context);
+              },
+              onVerticalSwipeComplete: (direction) {
+                if (direction == Direction.down) {
+                  Navigator.pop(context);
+                }
+              },
+              progressPosition: ProgressPosition.top,
+              repeat: true,
+              controller: storyController,
+              storyItems: [for (int i = 0; i < stories.length; i++) stories[i]],
+            )
+          : CircularProgressIndicator(),
     ));
   }
 }

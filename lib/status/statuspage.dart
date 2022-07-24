@@ -40,7 +40,6 @@ class _StatusPageState extends State<StatusPage> {
   Widget build(BuildContext context) {
     var h = MediaQuery.of(context).size.height;
     var w = MediaQuery.of(context).size.width;
-    print(userData);
     return SafeArea(
       child: Scaffold(
         body: Stack(
