@@ -230,7 +230,7 @@ class _HomePageState extends State<HomePage>
   }
 
   imgPicker(ImageSource filePath) async {
-    XFile? file = await _picker.pickImage(source: filePath);
+    XFile? file = await _picker.pickImage(source: filePath, imageQuality: 45);
     if (file != null) {
       image = File(file.path);
       setState(() {});
@@ -242,29 +242,23 @@ class _HomePageState extends State<HomePage>
 
     var ref = FirebaseStorage.instance.ref().child('status/$fileName');
     UploadTask uploadTask = ref.putFile(File(image!.path));
-
-    uploadTask
-        .then((res) async {
-          url = (await ref.getDownloadURL()).toString();
-          statusList.add({
-            'type': "image",
-            'url': url,
-            'sendTime': DateTime.now(),
-          });
-        })
-        .then((value) =>
-            FirebaseFirestore.instance.collection('status').doc(userId).set({
-              'SenderName': userData.displayName,
-              'senderId': userId,
-              'viewed': [],
-              'status': FieldValue.arrayUnion(statusList)
-            }))
-        .then((value) {
-          setState(() {
-            image = null;
-            print("status uploaded");
-          });
-        });
+    setState(() {
+      image = null;
+    });
+    uploadTask.then((res) async {
+      url = (await ref.getDownloadURL()).toString();
+      statusList.add({
+        'type': "image",
+        'url': url,
+        'sendTime': DateTime.now(),
+      });
+    }).then((value) =>
+        FirebaseFirestore.instance.collection('status').doc(userId).set({
+          'SenderName': userData.displayName,
+          'senderId': userId,
+          'viewed': [],
+          'status': FieldValue.arrayUnion(statusList)
+        }));
   }
 
   imgChooser() {

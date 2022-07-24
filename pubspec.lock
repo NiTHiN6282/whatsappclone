@@ -584,9 +584,11 @@ packages:
   status_view:
     dependency: "direct main"
     description:
-      name: status_view
-      url: "https://pub.dartlang.org"
-    source: hosted
+      path: "."
+      ref: HEAD
+      resolved-ref: "0921782395282ac6463425b7fd5b89b85df190a9"
+      url: "https://github.com/NiTHiN6282/flutter_status_view.git"
+    source: git
     version: "0.0.2"
   story_view:
     dependency: "direct main"

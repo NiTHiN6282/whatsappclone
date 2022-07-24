@@ -42,7 +42,9 @@ dependencies:
   story_view: ^0.13.2
   cached_network_image: ^3.2.1
   badges: ^2.0.3
-  status_view: ^0.0.2
+  status_view:
+    git:
+      url: https://github.com/NiTHiN6282/flutter_status_view.git
   image_picker: ^0.8.5+3
   firebase_storage: ^10.3.3
 

@@ -251,10 +251,18 @@ class _StatusPageState extends State<StatusPage> {
                     ? SizedBox()
                     : Container(
                         color: Colors.black,
-                        child: Image.file(
-                          image!,
-                          height: MediaQuery.of(context).size.height,
-                          width: MediaQuery.of(context).size.width,
+                        height: MediaQuery.of(context).size.height,
+                        width: MediaQuery.of(context).size.width,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Container(
+                              child: Image.file(
+                                image!,
+                                width: MediaQuery.of(context).size.width,
+                              ),
+                            ),
+                          ],
                         ),
                       ))
           ],
