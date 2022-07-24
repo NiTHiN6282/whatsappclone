@@ -32,7 +32,7 @@ class _ChatPageState extends State<ChatPage> {
               .snapshots(),
           builder: (context, snapshot) {
             if (!snapshot.hasData) {
-              return CircularProgressIndicator();
+              return SizedBox();
             } else if (snapshot.hasData && snapshot.data!.docs.isEmpty) {
               return Text("No Chats");
             } else {
