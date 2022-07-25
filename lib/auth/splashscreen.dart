@@ -3,10 +3,10 @@ import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:whatsappclone/auth/login.dart';
 import 'package:whatsappclone/homepage.dart';
-import 'package:whatsappclone/login.dart';
 
-import 'main.dart';
+import '../main.dart';
 
 class SplashScreen extends StatefulWidget {
   _SplashScreenState createState() => _SplashScreenState();

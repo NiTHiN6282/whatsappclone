@@ -1,6 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:whatsappclone/splashscreen.dart';
+import 'package:whatsappclone/auth/splashscreen.dart';
 
 var userData;
 var userId;
