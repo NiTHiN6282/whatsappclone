@@ -1,9 +1,11 @@
 import 'dart:async';
 import 'dart:io';
+import 'dart:math';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -36,7 +38,12 @@ class _MessagePageState extends State<MessagePage> {
   bool keyboardShowing = false;
   final ImagePicker _picker = ImagePicker();
   File? chatimage;
+  File? file;
   dynamic url;
+  String? chatfileName;
+  String? ext;
+  String? size;
+  var bytes;
 
   _onEmojiSelected(Emoji emoji) {
     messageController
@@ -200,10 +207,40 @@ class _MessagePageState extends State<MessagePage> {
                                                                       .white,
                                                                 ),
                                                               )
-                                                            : CachedNetworkImage(
-                                                                imageUrl: data[
-                                                                        index]
-                                                                    ['photo'])),
+                                                            : data[index][
+                                                                        'type'] ==
+                                                                    "image"
+                                                                ? CachedNetworkImage(
+                                                                    imageUrl: data[
+                                                                            index]
+                                                                        [
+                                                                        'photo'])
+                                                                : Column(
+                                                                    children: [
+                                                                      Row(
+                                                                        children: [
+                                                                          Icon(Icons
+                                                                              .file_present),
+                                                                          Text(
+                                                                            data[index]['fileName'],
+                                                                            style:
+                                                                                TextStyle(color: Colors.white),
+                                                                          )
+                                                                        ],
+                                                                      ),
+                                                                      Row(
+                                                                        children: [
+                                                                          Text(data[index]['size']
+                                                                              .toString()),
+                                                                          Text(
+                                                                              "•"),
+                                                                          Text(data[index]
+                                                                              [
+                                                                              'ext'])
+                                                                        ],
+                                                                      )
+                                                                    ],
+                                                                  )),
                                                     Positioned(
                                                       bottom: 4,
                                                       right: 10,
@@ -322,7 +359,9 @@ class _MessagePageState extends State<MessagePage> {
                               SizedBox(
                                 width: 35,
                                 child: IconButton(
-                                  onPressed: () {},
+                                  onPressed: () {
+                                    pickFile();
+                                  },
                                   splashRadius: 1,
                                   icon: const Icon(
                                     Icons.attach_file,
@@ -494,20 +533,68 @@ class _MessagePageState extends State<MessagePage> {
     });
     uploadTask.then((res) async {
       url = (await ref.getDownloadURL()).toString();
-      // statusList.add({
-      //   'type': "image",
-      //   'url': url,
-      //   'sendTime': DateTime.now(),
-      // });
     }).then((value) => FirebaseFirestore.instance.collection('chat').add({
           "photo": url,
           "receiverId": widget.rid,
           "senderId": widget.uid,
           "sendTime": DateTime.now(),
           "isRead": false,
-          "type": "photo"
+          "type": "image"
         }).then((value) {
           value.update({"msgId": value.id});
         }));
+  }
+
+  sendFile() {
+    var ref = FirebaseStorage.instance
+        .ref()
+        .child('chat/${DateTime.now().toString()}');
+    UploadTask uploadTask = ref.putFile(File(file!.path));
+    setState(() {
+      file = null;
+    });
+    uploadTask.then((res) async {
+      url = (await ref.getDownloadURL()).toString();
+    }).then((value) => FirebaseFirestore.instance.collection('chat').add({
+          "file": url,
+          "fileName": chatfileName,
+          "receiverId": widget.rid,
+          "senderId": widget.uid,
+          "sendTime": DateTime.now(),
+          "isRead": false,
+          "type": "file",
+          "ext": ext,
+          "size": size,
+          "bytes": bytes,
+        }).then((value) {
+          value.update({"msgId": value.id});
+        }));
+  }
+
+  pickFile() async {
+    FilePickerResult? result = await FilePicker.platform.pickFiles();
+
+    if (result != null) {
+      file = File(result.files.single.path!);
+      chatfileName = result.files.single.name;
+      ext = result.files.single.extension;
+      bytes = result.files.single.bytes;
+
+      size = formatBytes(result.files.single.size, 2);
+      setState(() {});
+      sendFile();
+      print('bytes!!!!!!!!' + bytes.toString());
+    } else {
+      // User canceled the picker
+    }
+  }
+
+  static String formatBytes(int bytes, int decimals) {
+    if (bytes <= 0) return "0 B";
+    const suffixes = ["B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"];
+    var i = (log(bytes) / log(1024)).floor();
+    return ((bytes / pow(1000, i)).toStringAsFixed(decimals)) +
+        ' ' +
+        suffixes[i];
   }
 }

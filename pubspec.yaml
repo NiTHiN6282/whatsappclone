@@ -47,6 +47,7 @@ dependencies:
       url: https://github.com/NiTHiN6282/flutter_status_view.git
   image_picker: ^0.8.5+3
   firebase_storage: ^10.3.3
+  file_picker: ^5.0.0
 
 dev_dependencies:
   flutter_test:
