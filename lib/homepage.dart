@@ -256,6 +256,7 @@ class _HomePageState extends State<HomePage>
         'type': "image",
         'url': url,
         'sendTime': DateTime.now(),
+        'viewed': []
       });
     }).then((value) =>
         FirebaseFirestore.instance.collection('status').doc(userId).set({
