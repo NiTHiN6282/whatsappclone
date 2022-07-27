@@ -11,6 +11,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
+import 'package:whatsappclone/chat/viewer/imageviewer.dart';
+import 'package:whatsappclone/chat/viewer/videoviewer.dart';
 import 'package:whatsappclone/main.dart';
 
 class MessagePage extends StatefulWidget {
@@ -185,62 +187,110 @@ class _MessagePageState extends State<MessagePage> {
                                                     vertical: 5),
                                                 child: Stack(
                                                   children: [
-                                                    Padding(
-                                                        padding:
-                                                            const EdgeInsets
-                                                                .only(
-                                                          left: 10,
-                                                          right: 30,
-                                                          top: 5,
-                                                          bottom: 20,
-                                                        ),
-                                                        child: data[index]
-                                                                    ['type'] ==
-                                                                "text"
-                                                            ? Text(
-                                                                data[index]
-                                                                    ["message"],
-                                                                style:
-                                                                    TextStyle(
-                                                                  fontSize: 16,
-                                                                  color: Colors
-                                                                      .white,
+                                                    InkWell(
+                                                      onTap: () {
+                                                        if (data[index]
+                                                                ['type'] ==
+                                                            "image") {
+                                                          Navigator.push(
+                                                              context,
+                                                              MaterialPageRoute(
+                                                                builder:
+                                                                    (context) =>
+                                                                        ImageViewPage(
+                                                                  url: data[
+                                                                          index]
+                                                                      ['file'],
                                                                 ),
-                                                              )
-                                                            : data[index][
-                                                                        'type'] ==
-                                                                    "image"
-                                                                ? CachedNetworkImage(
-                                                                    imageUrl: data[
+                                                              ));
+                                                        } else if (data[index]
+                                                                ['type'] ==
+                                                            "file") {
+                                                          if (data[index]
+                                                                  ['ext'] ==
+                                                              "mp4") {
+                                                            Navigator.push(
+                                                                context,
+                                                                MaterialPageRoute(
+                                                                  builder:
+                                                                      (context) =>
+                                                                          VideoViewPage(
+                                                                    url: data[
                                                                             index]
                                                                         [
-                                                                        'photo'])
-                                                                : Column(
-                                                                    children: [
-                                                                      Row(
-                                                                        children: [
-                                                                          Icon(Icons
-                                                                              .file_present),
-                                                                          Text(
-                                                                            data[index]['fileName'],
-                                                                            style:
-                                                                                TextStyle(color: Colors.white),
-                                                                          )
-                                                                        ],
-                                                                      ),
-                                                                      Row(
-                                                                        children: [
-                                                                          Text(data[index]['size']
-                                                                              .toString()),
-                                                                          Text(
-                                                                              "•"),
-                                                                          Text(data[index]
+                                                                        'file'],
+                                                                  ),
+                                                                ));
+                                                          } else if (data[index]
+                                                                  ['ext'] ==
+                                                              "jpg") {
+                                                            Navigator.push(
+                                                                context,
+                                                                MaterialPageRoute(
+                                                                  builder:
+                                                                      (context) =>
+                                                                          ImageViewPage(
+                                                                    url: data[
+                                                                            index]
+                                                                        [
+                                                                        'file'],
+                                                                  ),
+                                                                ));
+                                                          }
+                                                        }
+                                                      },
+                                                      child: Container(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .only(
+                                                            left: 10,
+                                                            right: 30,
+                                                            top: 5,
+                                                            bottom: 20,
+                                                          ),
+                                                          child: data[index][
+                                                                      'type'] ==
+                                                                  "text"
+                                                              ? Text(
+                                                                  data[index][
+                                                                      "message"],
+                                                                  style:
+                                                                      TextStyle(
+                                                                    fontSize:
+                                                                        16,
+                                                                    color: Colors
+                                                                        .white,
+                                                                  ),
+                                                                )
+                                                              : data[index][
+                                                                          'type'] ==
+                                                                      "image"
+                                                                  ? CachedNetworkImage(
+                                                                      imageUrl:
+                                                                          data[index]
                                                                               [
-                                                                              'ext'])
-                                                                        ],
-                                                                      )
-                                                                    ],
-                                                                  )),
+                                                                              'file'])
+                                                                  : Column(
+                                                                      children: [
+                                                                        Row(
+                                                                          children: [
+                                                                            Icon(Icons.file_present),
+                                                                            Text(
+                                                                              data[index]['fileName'],
+                                                                              style: TextStyle(color: Colors.white),
+                                                                            )
+                                                                          ],
+                                                                        ),
+                                                                        Row(
+                                                                          children: [
+                                                                            Text(data[index]['size'].toString()),
+                                                                            Text("•"),
+                                                                            Text(data[index]['ext'])
+                                                                          ],
+                                                                        )
+                                                                      ],
+                                                                    )),
+                                                    ),
                                                     Positioned(
                                                       bottom: 4,
                                                       right: 10,
@@ -534,7 +584,7 @@ class _MessagePageState extends State<MessagePage> {
     uploadTask.then((res) async {
       url = (await ref.getDownloadURL()).toString();
     }).then((value) => FirebaseFirestore.instance.collection('chat').add({
-          "photo": url,
+          "file": url,
           "receiverId": widget.rid,
           "senderId": widget.uid,
           "sendTime": DateTime.now(),
@@ -565,7 +615,6 @@ class _MessagePageState extends State<MessagePage> {
           "type": "file",
           "ext": ext,
           "size": size,
-          "bytes": bytes,
         }).then((value) {
           value.update({"msgId": value.id});
         }));
