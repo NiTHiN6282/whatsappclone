@@ -37,7 +37,8 @@ class MessagePage extends StatefulWidget {
 class _MessagePageState extends State<MessagePage> {
   TextEditingController messageController = TextEditingController();
   bool emojiShowing = false;
-  bool keyboardShowing = false;
+
+  // bool keyboardShowing = false;
   final ImagePicker _picker = ImagePicker();
   File? chatimage;
   File? file;
@@ -72,7 +73,7 @@ class _MessagePageState extends State<MessagePage> {
             fit: BoxFit.cover),
       ),
       child: Scaffold(
-        resizeToAvoidBottomInset: false,
+        // resizeToAvoidBottomInset: false,
         backgroundColor: Colors.transparent,
         appBar: AppBar(
           title: Text(
@@ -371,7 +372,7 @@ class _MessagePageState extends State<MessagePage> {
                                 onPressed: () {
                                   setState(() {
                                     emojiShowing = !emojiShowing;
-                                    keyboardShowing = false;
+                                    // keyboardShowing = false;
                                     FocusManager.instance.primaryFocus
                                         ?.unfocus();
                                   });
@@ -389,10 +390,17 @@ class _MessagePageState extends State<MessagePage> {
                                   child: TextField(
                                       onTap: () {
                                         emojiShowing = false;
-                                        keyboardShowing = true;
+                                        // keyboardShowing = true;
                                         setState(() {});
-                                        Timer(Duration(milliseconds: 700), () {
-                                          keyboardShowing = false;
+                                        // Timer(Duration(milliseconds: 700), () {
+                                        //   keyboardShowing = false;
+                                        // });
+                                      },
+                                      onChanged: (value) {
+                                        // keyboardShowing = true;
+                                        setState(() {});
+                                        Timer(Duration(milliseconds: 100), () {
+                                          // keyboardShowing = false;
                                         });
                                       },
                                       controller: messageController,
@@ -457,7 +465,9 @@ class _MessagePageState extends State<MessagePage> {
                           ),
                           child: IconButton(
                             color: Colors.white,
-                            icon: Icon(Icons.send),
+                            icon: Icon(messageController.text.isEmpty
+                                ? Icons.mic
+                                : Icons.send),
                             onPressed: () {
                               if (messageController.text.isNotEmpty) {
                                 sendMessage();
@@ -468,12 +478,12 @@ class _MessagePageState extends State<MessagePage> {
                         ),
                       ],
                     )),
-                Offstage(
-                  offstage: !keyboardShowing,
-                  child: SizedBox(
-                    height: 250,
-                  ),
-                ),
+                // Offstage(
+                //   offstage: !keyboardShowing,
+                //   child: SizedBox(
+                //     height: 250,
+                //   ),
+                // ),
                 Offstage(
                   offstage: !emojiShowing,
                   child: SizedBox(
