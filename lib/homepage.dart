@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:whatsappclone/auth/login.dart';
+import 'package:whatsappclone/search/chatsearch.dart';
 import 'package:whatsappclone/status/statuspage.dart';
 
 import 'chat/chatpage.dart';
@@ -78,7 +79,16 @@ class _HomePageState extends State<HomePage>
               fontWeight: FontWeight.w400),
         ),
         actions: [
-          Icon(Icons.search, color: Color(0xff728088)),
+          IconButton(
+              onPressed: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ChatSearch(),
+                    ));
+              },
+              icon: Icon(Icons.search),
+              color: Color(0xff728088)),
           SizedBox(
             width: 10,
           ),
