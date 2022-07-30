@@ -215,23 +215,19 @@ class _HomePageState extends State<HomePage>
                     ))
                 : SizedBox(),
             Positioned(
-              bottom: 2,
+                bottom: 2,
                 right: 5,
                 child: FloatingActionButton(
-              heroTag: "btn2",
-              backgroundColor: Color(0xff168670),
-              onPressed: () {
-                if (_selectedIndex == 1) {
-                } else if (_selectedIndex == 2) {
-                  if (image == null) {
-                    imgChooser();
-                  } else {
-                    uploadToStorage();
-                  }
-                } else if (_selectedIndex == 3) {}
-              },
-              child: iconCondition(),
-            )),
+                  heroTag: "btn2",
+                  backgroundColor: Color(0xff168670),
+                  onPressed: () {
+                    if (_selectedIndex == 1) {
+                    } else if (_selectedIndex == 2) {
+                      imgChooser();
+                    } else if (_selectedIndex == 3) {}
+                  },
+                  child: iconCondition(),
+                )),
           ],
         ),
       ),
@@ -242,7 +238,7 @@ class _HomePageState extends State<HomePage>
     if (_selectedIndex == 1) {
       return Icon(Icons.message);
     } else if (_selectedIndex == 2) {
-      return image == null ? Icon(Icons.camera_alt_rounded) : Icon(Icons.done);
+      return Icon(Icons.camera_alt_rounded);
     } else if (_selectedIndex == 3) {
       return Icon(Icons.add_call);
     }
@@ -252,6 +248,7 @@ class _HomePageState extends State<HomePage>
     XFile? file = await _picker.pickImage(source: filePath, imageQuality: 45);
     if (file != null) {
       image = File(file.path);
+      uploadToStorage();
       setState(() {});
     }
   }

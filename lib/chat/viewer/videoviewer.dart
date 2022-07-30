@@ -26,6 +26,9 @@ class _VideoViewPageState extends State<VideoViewPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Color(0xff1c252c),
+      ),
       body: Center(
         child: _controller.value.isInitialized
             ? AspectRatio(

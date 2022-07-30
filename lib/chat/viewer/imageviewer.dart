@@ -14,6 +14,9 @@ class _ImageViewPageState extends State<ImageViewPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Color(0xff1c252c),
+      ),
       body: Center(
         child: CachedNetworkImage(imageUrl: widget.url),
       ),
