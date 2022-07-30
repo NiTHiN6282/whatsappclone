@@ -26,10 +26,13 @@ class _SplashScreenState extends State<SplashScreen> {
   Future initializeUser() async {
     await Firebase.initializeApp();
     final User? firebaseUser = await _auth.currentUser;
-    await firebaseUser!.reload();
-    _user = (await _auth.currentUser)!;
-    userId = _user.uid;
-    userData = _user;
+    await firebaseUser?.reload();
+    if(_auth.currentUser!=null){
+      _user = (await _auth.currentUser)!;
+      userId = _user.uid;
+      userData = _user;
+    }
+
   }
 
   navigateUser() async {

@@ -203,16 +203,20 @@ class _HomePageState extends State<HomePage>
             image == null
                 ? Positioned(
                     bottom: editBottom,
-                    left: 5,
+                    right: 10,
                     width: 45,
                     child: FloatingActionButton(
                       heroTag: "btn1",
                       backgroundColor: Color(0xff1c252c),
-                      onPressed: () {},
+                      onPressed: () {
+                        print("hello");
+                      },
                       child: Icon(Icons.edit),
                     ))
                 : SizedBox(),
             Positioned(
+              bottom: 2,
+                right: 5,
                 child: FloatingActionButton(
               heroTag: "btn2",
               backgroundColor: Color(0xff168670),

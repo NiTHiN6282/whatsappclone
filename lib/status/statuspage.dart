@@ -1,6 +1,7 @@
 import 'package:badges/badges.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:status_view/status_view.dart';
@@ -41,6 +42,7 @@ class _StatusPageState extends State<StatusPage> {
   Widget build(BuildContext context) {
     var h = MediaQuery.of(context).size.height;
     var w = MediaQuery.of(context).size.width;
+    var photo=FirebaseAuth.instance.currentUser?.photoURL;
     return SafeArea(
       child: Scaffold(
         body: Stack(
@@ -85,7 +87,8 @@ class _StatusPageState extends State<StatusPage> {
                                           radius: 25,
                                           backgroundImage:
                                               CachedNetworkImageProvider(
-                                                  userData.photoURL),
+                                                  photo!
+                                              ),
                                         )
                                       : StreamBuilder<QuerySnapshot>(
                                           stream: FirebaseFirestore.instance
@@ -220,7 +223,7 @@ class _StatusPageState extends State<StatusPage> {
                               itemCount: data?.length,
                               itemBuilder: (context, index) {
                                 var statlen = data![index]['status'].length;
-                                if (statlen == null) {
+                                if (statlen != 0) {
                                   Timestamp t = data[index]["status"]
                                       [statlen - 1]['sendTime'];
                                   DateTime d = t.toDate();
