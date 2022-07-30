@@ -276,9 +276,11 @@ class _MessagePageState extends State<MessagePage> {
                                                                         Row(
                                                                           children: [
                                                                             Icon(Icons.file_present),
-                                                                            Text(
-                                                                              data[index]['fileName'],
-                                                                              style: TextStyle(color: Colors.white),
+                                                                            Flexible(
+                                                                              child: Text(
+                                                                                data[index]['fileName'],
+                                                                                style: TextStyle(color: Colors.white, overflow: TextOverflow.ellipsis),
+                                                                              ),
                                                                             )
                                                                           ],
                                                                         ),
