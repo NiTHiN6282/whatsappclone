@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:status_view/status_view.dart';
 import 'package:whatsappclone/main.dart';
+import 'package:whatsappclone/status/statuslist.dart';
 import 'package:whatsappclone/status/statusview.dart';
 
 import '../homepage.dart';
@@ -64,90 +65,131 @@ class _StatusPageState extends State<StatusPage> {
                     },
                     child: Container(
                       child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Badge(
-                            toAnimate: false,
-                            showBadge: statusList.isEmpty ? true : false,
-                            position: BadgePosition(bottom: 1, start: 30),
-                            badgeColor: Color(0xff168670),
-                            badgeContent: Icon(
-                              Icons.add,
-                              size: 13,
-                              color: Colors.white,
+                          Container(
+                            child: Row(
+                              children: [
+                                Badge(
+                                  toAnimate: false,
+                                  showBadge: statusList.isEmpty ? true : false,
+                                  position: BadgePosition(bottom: 1, start: 30),
+                                  badgeColor: Color(0xff168670),
+                                  badgeContent: Icon(
+                                    Icons.add,
+                                    size: 13,
+                                    color: Colors.white,
+                                  ),
+                                  child: statusList.isEmpty
+                                      ? CircleAvatar(
+                                          radius: 25,
+                                          backgroundImage:
+                                              CachedNetworkImageProvider(
+                                                  userData.photoURL),
+                                        )
+                                      : StreamBuilder<QuerySnapshot>(
+                                          stream: FirebaseFirestore.instance
+                                              .collection('status')
+                                              .where("senderId",
+                                                  isEqualTo: userId)
+                                              .snapshots(),
+                                          builder: (context, snapshot) {
+                                            var data;
+                                            var statlen;
+                                            if (!snapshot.hasData) {
+                                              return Text("No messages");
+                                            } else if (snapshot.hasData &&
+                                                snapshot.data!.docs.isEmpty) {
+                                              return Badge(
+                                                toAnimate: false,
+                                                position: BadgePosition(
+                                                    bottom: 1, start: 30),
+                                                badgeColor: Color(0xff168670),
+                                                badgeContent: Icon(
+                                                  Icons.add,
+                                                  size: 13,
+                                                  color: Colors.white,
+                                                ),
+                                                child: CircleAvatar(
+                                                  radius: 25,
+                                                  backgroundImage:
+                                                      CachedNetworkImageProvider(
+                                                          userData.photoURL),
+                                                ),
+                                              );
+                                            } else {
+                                              data = snapshot.data!.docs;
+                                              statlen =
+                                                  data[0]['status'].length;
+                                              return StatusView(
+                                                radius: 30,
+                                                spacing: 15,
+                                                strokeWidth: 2,
+                                                indexOfSeenStatus: statlen,
+                                                numberOfStatus:
+                                                    data[0]['status'].length,
+                                                padding: 4,
+                                                centerImageUrl: data[0]
+                                                        ['status'][statlen - 1]
+                                                    ['url'],
+                                                seenColor: Colors.grey,
+                                                unSeenColor: Colors.green,
+                                              );
+                                            }
+                                          }),
+                                ),
+                                SizedBox(
+                                  width: 15,
+                                ),
+                                statusList.isEmpty
+                                    ? Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            "My status",
+                                            style: TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 17),
+                                          ),
+                                          SizedBox(height: 5),
+                                          Text(
+                                            "Tap to add status update",
+                                            style: TextStyle(
+                                                color: Colors.grey,
+                                                fontSize: 14),
+                                          )
+                                        ],
+                                      )
+                                    : Text(
+                                        "Just now",
+                                        style: TextStyle(
+                                          color: Color(0xff728088),
+                                        ),
+                                      ),
+                              ],
                             ),
-                            child: statusList.isEmpty
-                                ? CircleAvatar(
-                                    radius: 25,
-                                    backgroundImage: CachedNetworkImageProvider(
-                                        userData.photoURL),
-                                  )
-                                : StreamBuilder<QuerySnapshot>(
-                                    stream: FirebaseFirestore.instance
-                                        .collection('status')
-                                        .where("senderId", isEqualTo: userId)
-                                        .snapshots(),
-                                    builder: (context, snapshot) {
-                                      var data;
-                                      var statlen;
-                                      if (!snapshot.hasData) {
-                                        return Text("No messages");
-                                      } else if (snapshot.hasData &&
-                                          snapshot.data!.docs.isEmpty) {
-                                        return Badge(
-                                          toAnimate: false,
-                                          position: BadgePosition(
-                                              bottom: 1, start: 30),
-                                          badgeColor: Color(0xff168670),
-                                          badgeContent: Icon(
-                                            Icons.add,
-                                            size: 13,
-                                            color: Colors.white,
-                                          ),
-                                          child: CircleAvatar(
-                                            radius: 25,
-                                            backgroundImage:
-                                                CachedNetworkImageProvider(
-                                                    userData.photoURL),
-                                          ),
-                                        );
-                                      } else {
-                                        data = snapshot.data!.docs;
-                                        statlen = data[0]['status'].length;
-                                        return StatusView(
-                                          radius: 30,
-                                          spacing: 15,
-                                          strokeWidth: 2,
-                                          indexOfSeenStatus: statlen,
-                                          numberOfStatus:
-                                              data[0]['status'].length,
-                                          padding: 4,
-                                          centerImageUrl: data[0]['status']
-                                              [statlen - 1]['url'],
-                                          seenColor: Colors.grey,
-                                          unSeenColor: Colors.green,
-                                        );
-                                      }
-                                    }),
                           ),
-                          SizedBox(
-                            width: 15,
-                          ),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                "My status",
-                                style: TextStyle(
-                                    color: Colors.white, fontSize: 17),
-                              ),
-                              SizedBox(height: 5),
-                              Text(
-                                "Tap to add status update",
-                                style:
-                                    TextStyle(color: Colors.grey, fontSize: 14),
-                              )
-                            ],
-                          )
+                          statusList.isNotEmpty
+                              ? Align(
+                                  alignment: Alignment.centerRight,
+                                  child: IconButton(
+                                      onPressed: () {
+                                        Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) =>
+                                                  StatusList(),
+                                            )).then((value) {
+                                          setState(() {});
+                                        });
+                                      },
+                                      icon: Icon(
+                                        Icons.more_horiz,
+                                        color: Colors.grey,
+                                      )),
+                                )
+                              : SizedBox()
                         ],
                       ),
                     ),
@@ -178,64 +220,69 @@ class _StatusPageState extends State<StatusPage> {
                               itemCount: data?.length,
                               itemBuilder: (context, index) {
                                 var statlen = data![index]['status'].length;
-                                Timestamp t = data[index]["status"][statlen - 1]
-                                    ['sendTime'];
-                                DateTime d = t.toDate();
-                                return InkWell(
-                                  onTap: () {
-                                    Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) => StatusViewPage(
-                                            id: data[index]['senderId'],
+                                if (statlen == null) {
+                                  Timestamp t = data[index]["status"]
+                                      [statlen - 1]['sendTime'];
+                                  DateTime d = t.toDate();
+                                  return InkWell(
+                                    onTap: () {
+                                      Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                StatusViewPage(
+                                              id: data[index]['senderId'],
+                                            ),
+                                          ));
+                                    },
+                                    child: Container(
+                                      padding: EdgeInsets.only(bottom: 10),
+                                      child: Row(
+                                        children: [
+                                          StatusView(
+                                            radius: 30,
+                                            spacing: 15,
+                                            strokeWidth: 2,
+                                            // indexOfSeenStatus: 2,
+                                            numberOfStatus:
+                                                data[index]['status'].length,
+                                            padding: 4,
+                                            centerImageUrl: data[index]
+                                                ['status'][statlen - 1]['url'],
+                                            seenColor: Colors.grey,
+                                            unSeenColor: Colors.green,
                                           ),
-                                        ));
-                                  },
-                                  child: Container(
-                                    padding: EdgeInsets.only(bottom: 10),
-                                    child: Row(
-                                      children: [
-                                        StatusView(
-                                          radius: 30,
-                                          spacing: 15,
-                                          strokeWidth: 2,
-                                          // indexOfSeenStatus: 2,
-                                          numberOfStatus:
-                                              data[index]['status'].length,
-                                          padding: 4,
-                                          centerImageUrl: data[index]['status']
-                                              [statlen - 1]['url'],
-                                          seenColor: Colors.grey,
-                                          unSeenColor: Colors.green,
-                                        ),
-                                        SizedBox(
-                                          width: 20,
-                                        ),
-                                        Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              data[index]['SenderName'],
-                                              style: TextStyle(
-                                                  color: Colors.white,
-                                                  fontSize: 15),
-                                            ),
-                                            SizedBox(
-                                              height: 4,
-                                            ),
-                                            Text(
-                                                DateFormat("h:mm a")
-                                                    .format(d)
-                                                    .toLowerCase(),
+                                          SizedBox(
+                                            width: 20,
+                                          ),
+                                          Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                data[index]['SenderName'],
                                                 style: TextStyle(
-                                                    color: Colors.grey)),
-                                          ],
-                                        )
-                                      ],
+                                                    color: Colors.white,
+                                                    fontSize: 15),
+                                              ),
+                                              SizedBox(
+                                                height: 4,
+                                              ),
+                                              Text(
+                                                  DateFormat("h:mm a")
+                                                      .format(d)
+                                                      .toLowerCase(),
+                                                  style: TextStyle(
+                                                      color: Colors.grey)),
+                                            ],
+                                          )
+                                        ],
+                                      ),
                                     ),
-                                  ),
-                                );
+                                  );
+                                } else {
+                                  return SizedBox();
+                                }
                               },
                             );
                           }

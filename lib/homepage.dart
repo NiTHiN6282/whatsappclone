@@ -260,21 +260,26 @@ class _HomePageState extends State<HomePage>
     setState(() {
       image = null;
     });
-    uploadTask.then((res) async {
-      url = (await ref.getDownloadURL()).toString();
-      statusList.add({
-        'type': "image",
-        'url': url,
-        'sendTime': DateTime.now(),
-        'viewed': []
-      });
-    }).then((value) =>
-        FirebaseFirestore.instance.collection('status').doc(userId).set({
-          'SenderName': userData.displayName,
-          'senderId': userId,
-          'viewed': [],
-          'status': FieldValue.arrayUnion(statusList)
-        }));
+    uploadTask
+        .then((res) async {
+          url = (await ref.getDownloadURL()).toString();
+          statusList.add({
+            'type': "image",
+            'url': url,
+            'sendTime': DateTime.now(),
+            'viewed': []
+          });
+        })
+        .then((value) =>
+            FirebaseFirestore.instance.collection('status').doc(userId).set({
+              'SenderName': userData.displayName,
+              'senderId': userId,
+              'viewed': [],
+              'status': FieldValue.arrayUnion(statusList)
+            }))
+        .then((value) {
+          setState(() {});
+        });
   }
 
   imgChooser() {
